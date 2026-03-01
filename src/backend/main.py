@@ -27,7 +27,10 @@ model.load_state_dict(torch.load("lung_model.pth", map_location=device))
 model.to(device)
 model.eval()
 
+
+#ignore txtx and add only case images from dataset
 class_names = ['Benign cases', 'Malignant cases', 'Normal cases']
+
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -42,7 +45,7 @@ async def predict(
     family_history: bool = Form(...)
 ):
 
-   # Read image
+   # read image
     contents = await file.read()
     image = Image.open(io.BytesIO(contents)).convert("RGB")
 
@@ -73,7 +76,7 @@ async def predict(
 
     return {
         "prediction": class_names[predicted_class],
-        "image_probability": round(image_malignant_prob, 3),
+        "image_probability": round(image_malignant_prob, 3), #prob 3 in decimal places
         "final_risk": round(final_risk, 3),
         "risk_level": risk_level
     } 
