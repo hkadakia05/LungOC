@@ -42,4 +42,38 @@ async def predict(
     family_history: bool = Form(...)
 ):
 
-   
+   # Read image
+    contents = await file.read()
+    image = Image.open(io.BytesIO(contents)).convert("RGB")
+
+    input_tensor = transform(image).unsqueeze(0).to(device)
+
+    with torch.no_grad():
+        outputs = model(input_tensor)
+        probs = torch.softmax(outputs, dim=1)
+        predicted_class = torch.argmax(probs, dim=1).item()
+
+    image_malignant_prob = probs[0][1].item()
+
+    # Clinical risk formula
+    clinical_score = (
+        0.01 * age +
+        0.02 * smoking +
+        (0.1 if family_history else 0)
+    )
+
+    final_risk = min(0.7 * image_malignant_prob + 0.3 * clinical_score, 1.0)
+
+    if final_risk > 0.7:
+        risk_level = "High"
+    elif final_risk > 0.4:
+        risk_level = "Moderate"
+    else:
+        risk_level = "Low"
+
+    return {
+        "prediction": class_names[predicted_class],
+        "image_probability": round(image_malignant_prob, 3),
+        "final_risk": round(final_risk, 3),
+        "risk_level": risk_level
+    } 
