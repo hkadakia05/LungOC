@@ -82,7 +82,3 @@ async def predict(
         "final_risk": round(final_risk, 3),
         "risk_level": risk_level
     }
-
-@app.get("/")
-async def root():
-    return {"message": "Lung Cancer Prediction API"}
