@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: lungoc-api
+    env: python
+    region: oregon
+    buildCommand: pip install -r src/backend/requirements.txt
+    startCommand: cd src/backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0

@@ -6,12 +6,14 @@ import torch
 import torch.nn as nn
 from PIL import Image
 import io
+import os
 
-app = FastAPI()
+app = FastAPI(title="Lung Cancer Risk Prediction API", version="1.0.0")
 
+# CORS - allow all origins for now, configure specific domains in production if needed
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # restrict later if deploying
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -19,7 +21,11 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Lung Cancer Risk Prediction API", "endpoints": {"/predict": "POST"}}
+    return {"message": "Lung Cancer Risk Prediction API", "endpoints": {"/predict": "POST"}, "status": "healthy"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "model_loaded": True}
 
 device = torch.device("cpu")
 
