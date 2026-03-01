@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from torchvision.models import resnet18
@@ -18,6 +17,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def root():
+    return {"message": "Lung Cancer Risk Prediction API", "endpoints": {"/predict": "POST"}}
 
 device = torch.device("cpu")
 
@@ -65,7 +67,7 @@ async def predict(
         (0.1 if family_history else 0)
     )
 
-    final_risk = min(0.7 * image_malignant_prob + 0.3 * clinical_score, 1.0)
+    final_risk = min(0.7 * image_malignant_prob + 0.3 * clinical_score, 1.0) #leveled 1.0 to avoid risk > 100%
 
     if final_risk > 0.7:
         risk_level = "High"
@@ -79,4 +81,8 @@ async def predict(
         "image_probability": round(image_malignant_prob, 3), #prob 3 in decimal places
         "final_risk": round(final_risk, 3),
         "risk_level": risk_level
-    } 
+    }
+
+@app.get("/")
+async def root():
+    return {"message": "Lung Cancer Prediction API"}
