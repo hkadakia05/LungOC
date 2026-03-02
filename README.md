@@ -106,7 +106,7 @@ See LICENSE file for details.
 
 ## 👥 Contributors
 
-UCSC BioHacks Team
+Heli :)
 
 ## 🔗 Links
 
