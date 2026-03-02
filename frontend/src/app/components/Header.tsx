@@ -1,5 +1,6 @@
-import { Activity, Menu, User } from "lucide-react";
+import { Activity, Menu } from "lucide-react";
 import { Button } from "./ui/button";
+import { AuthButtons } from "./AuthButtons";
 
 export function Header() {
   return (
@@ -35,10 +36,9 @@ export function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="hidden md:flex border-blue-300 text-blue-700 hover:bg-blue-50">
-              <User className="w-4 h-4 mr-2" />
-              Sign In
-            </Button>
+            <div className="hidden md:flex">
+              <AuthButtons />
+            </div>
             <Button className="md:hidden bg-blue-600 hover:bg-blue-700">
               <Menu className="w-5 h-5" />
             </Button>

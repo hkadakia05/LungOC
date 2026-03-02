@@ -7,6 +7,8 @@ import { Footer } from "./components/Footer";
 import { HeroSection } from "./components/HeroSection";
 import { Button } from "./components/ui/button";
 import { Sparkles, ArrowRight } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { saveScanToDatabase } from "../lib/database";
 
 interface UploadedFile {
   name: string;
@@ -29,6 +31,7 @@ interface RiskAssessment {
 }
 
 export default function App() {
+  const { user } = useAuth();
   const [age, setAge] = useState(42);
   const [smokingPackYears, setSmokingPackYears] = useState(0);
   const [familyHistory, setFamilyHistory] = useState(false);
@@ -166,6 +169,27 @@ export default function App() {
       };
 
       setAssessment(newAssessment);
+
+      // Save scan to database if user is logged in
+      if (user) {
+        try {
+          await saveScanToDatabase(
+            {
+              prediction: result.prediction,
+              risk_score: result.final_risk,
+              risk_level: riskLevel,
+              age,
+              smoking_pack_years: smokingPackYears,
+              family_history: familyHistory,
+              image_probability: result.image_probability,
+            },
+            user.id
+          );
+        } catch (dbError) {
+          console.error("Error saving scan to database:", dbError);
+          // Don't fail the analysis if database save fails
+        }
+      }
     } catch (error) {
       console.error("Analysis error:", error);
       const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
