@@ -1,7 +1,3 @@
-"""
-Image processing and model utilities for Lung Cancer Risk Prediction
-"""
-
 import numpy as np
 from PIL import Image
 import io
@@ -13,21 +9,9 @@ from torchvision import transforms
 logger = logging.getLogger(__name__)
 
 class ImageProcessor:
-    """Advanced image processing utilities"""
     
     @staticmethod
     def enhance_contrast(image: Image.Image, alpha: float = 1.5, beta: float = 0) -> Image.Image:
-        """
-        Enhance image contrast for better model performance
-        
-        Args:
-            image: PIL Image
-            alpha: Contrast multiplier (1.0 = original, >1.0 = more contrast)
-            beta: Brightness adjustment
-        
-        Returns:
-            Enhanced PIL Image
-        """
         try:
             img_array = np.array(image, dtype=np.float32)
             enhanced = np.clip(alpha * img_array + beta, 0, 255).astype(np.uint8)
@@ -38,7 +22,6 @@ class ImageProcessor:
     
     @staticmethod
     def normalize_image(image: Image.Image) -> Image.Image:
-        """Normalize image pixel values"""
         try:
             img_array = np.array(image, dtype=np.float32)
             mean = np.mean(img_array)
@@ -54,27 +37,19 @@ class ImageProcessor:
     
     @staticmethod
     def get_image_quality_score(image: Image.Image) -> float:
-        """
-        Calculate image quality score (0-1)
-        Based on contrast, brightness, and edge detection
-        """
         try:
             img_array = np.array(image, dtype=np.float32)
             
-            # Contrast score
             std = np.std(img_array)
-            contrast_score = min(std / 50, 1.0)  # Normalized to 0-1
+            contrast_score = min(std / 50, 1.0)
             
-            # Brightness score (prefer mid-range brightness)
             mean_brightness = np.mean(img_array)
             brightness_score = 1 - abs(mean_brightness - 128) / 128
             
-            # Edge detection (Sobel filter)
             from scipy import ndimage
             edges = ndimage.sobel(img_array.mean(axis=2))
             edge_score = np.mean(edges > 10)
             
-            # Combined quality score
             quality = (0.4 * contrast_score + 0.3 * brightness_score + 0.3 * edge_score)
             
             logger.info(f"Image quality: {quality:.2f} (contrast: {contrast_score:.2f}, brightness: {brightness_score:.2f}, edges: {edge_score:.2f})")
@@ -88,19 +63,7 @@ class ImageProcessor:
     def preprocess_for_model(image: Image.Image, 
                              enhance: bool = True,
                              normalize: bool = True) -> torch.Tensor:
-        """
-        Complete preprocessing pipeline for model inference
-        
-        Args:
-            image: PIL Image
-            enhance: Whether to enhance contrast
-            normalize: Whether to normalize pixel values
-        
-        Returns:
-            Preprocessed tensor
-        """
         try:
-            # Optional enhancements
             if enhance:
                 image = ImageProcessor.enhance_contrast(image)
             if normalize:
@@ -120,15 +83,12 @@ class ImageProcessor:
 
 
 class RiskCalculator:
-    """Advanced risk calculation utilities"""
     
-    # Risk thresholds (can be tuned)
     HIGH_RISK_THRESHOLD = 0.7
     MODERATE_RISK_THRESHOLD = 0.4
     
     @staticmethod
     def calculate_age_risk(age: int) -> float:
-        """Calculate age-based risk component"""
         if age < 40:
             return 0
         elif age < 50:
@@ -142,7 +102,6 @@ class RiskCalculator:
     
     @staticmethod
     def calculate_smoking_risk(pack_years: int) -> float:
-        """Calculate smoking-based risk component"""
         if pack_years == 0:
             return 0
         elif pack_years < 15:
@@ -163,27 +122,17 @@ class RiskCalculator:
         image_weight: float = 0.7,
         clinical_weight: float = 0.3
     ) -> Tuple[float, str]:
-        """
-        Calculate combined risk with age, smoking, and family history
-        
-        Returns:
-            Tuple of (risk_score, risk_level)
-        """
-        # Clinical risk components
         age_risk = RiskCalculator.calculate_age_risk(age)
         smoking_risk = RiskCalculator.calculate_smoking_risk(smoking)
         family_risk = 0.2 if family_history else 0
         
-        # Weighted clinical score
         clinical_score = (0.4 * age_risk + 0.4 * smoking_risk + 0.2 * family_risk)
         
-        # Combined risk
         final_risk = min(
             image_weight * image_malignancy_prob + clinical_weight * clinical_score,
             1.0
         )
         
-        # Determine risk level
         if final_risk >= RiskCalculator.HIGH_RISK_THRESHOLD:
             risk_level = "High"
         elif final_risk >= RiskCalculator.MODERATE_RISK_THRESHOLD:
@@ -195,7 +144,6 @@ class RiskCalculator:
     
     @staticmethod
     def get_risk_recommendations(risk_level: str, age: int, smoking: int) -> list:
-        """Generate clinical recommendations based on risk level"""
         recommendations = []
         
         if risk_level == "High":
@@ -217,11 +165,9 @@ class RiskCalculator:
                 "Maintain healthy lifestyle"
             ])
         
-        # Add smoking cessation advice if applicable
         if smoking > 0:
             recommendations.append("Smoking cessation programs strongly recommended")
         
-        # Add age-related recommendations
         if age >= 65:
             recommendations.append("Consider geriatric oncology consultation if diagnosed")
         
@@ -229,7 +175,6 @@ class RiskCalculator:
 
 
 class ModelEvaluator:
-    """Model evaluation and interpretation utilities"""
     
     @staticmethod
     def get_prediction_confidence_details(
@@ -237,13 +182,11 @@ class ModelEvaluator:
         predicted_class: int,
         class_names: list
     ) -> dict:
-        """Get detailed confidence metrics"""
         prob_values = list(probabilities.values())
         max_prob = max(prob_values)
         
-        # Confidence metrics
         confidence = max_prob
-        entropy = -sum(p * np.log(p + 1e-10) for p in prob_values)  # Shannon entropy
+        entropy = -sum(p * np.log(p + 1e-10) for p in prob_values)
         max_entropy = np.log(len(prob_values))
         uncertainty = entropy / max_entropy if max_entropy > 0 else 0
         
@@ -257,21 +200,17 @@ class ModelEvaluator:
     
     @staticmethod
     def detect_anomalies(image: Image.Image) -> dict:
-        """Detect potential image anomalies"""
         try:
             img_array = np.array(image, dtype=np.float32)
             
             anomalies = []
             
-            # Check for extreme values
             if np.max(img_array) == np.min(img_array):
                 anomalies.append("Uniform image (no variation)")
             
-            # Check for artifacts
             if np.std(img_array) < 10:
                 anomalies.append("Very low contrast (potential artifact)")
             
-            # Check for saturation
             if np.sum(img_array > 250) > (img_array.size * 0.05):
                 anomalies.append("Possible oversaturation")
             
