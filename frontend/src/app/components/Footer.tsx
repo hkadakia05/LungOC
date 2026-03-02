@@ -1,4 +1,4 @@
-import { Activity, Mail, Phone, MapPin, Heart } from "lucide-react";
+import { Activity, Mail, MapPin, Heart } from "lucide-react";
 
 export function Footer() {
   return (
@@ -49,15 +49,11 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-blue-200">
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                <span>support@mediscan.ai</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                <span>+1 (555) 123-4567</span>
+                <span>hkadakia@ucsc.edu</span>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
-                <span>Medical District, NY</span>
+                <span>1234 Imaginary lane</span>
               </li>
             </ul>
           </div>
