@@ -39,7 +39,10 @@ app.add_middleware(
 device = torch.device("cpu")
 model = resnet18(weights=None)
 model.fc = nn.Linear(512, 3)
-model.load_state_dict(torch.load("lung_model.pth", map_location=device))
+
+# Get model path - works from any directory
+model_path = Path(__file__).parent / "lung_model.pth"
+model.load_state_dict(torch.load(str(model_path), map_location=device))
 model.to(device)
 model.eval()
 
