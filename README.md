@@ -2,7 +2,7 @@
 
 > AI-powered lung cancer malignancy risk assessment tool combining deep learning with clinical risk factors
 
-UCSC BioHacks Project
+UCSC BioHacks Project 1st Place in AI Applications in Biomedical Research 
 
 ## 🎯 Overview
 
