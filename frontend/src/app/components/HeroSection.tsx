@@ -74,7 +74,7 @@ export function HeroSection() {
               />
               {/* Floating badge */}
               <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-full shadow-lg">
-                <p className="text-sm font-semibold">✨ Trusted by 500+ Hospitals</p>
+                <p className="text-sm font-semibold">🔒 Secure Patient Data • Get Expert Help</p>
               </div>
             </div>
           </div>
